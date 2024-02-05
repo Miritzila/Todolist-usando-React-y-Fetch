@@ -20,6 +20,21 @@ const Home = () => {
 
     const [newTask, setNewTask] = useState("");
 
+    const clearAllTasks = () => {
+        const options = {
+            method: 'DELETE',
+            headers: { 'User-Agent': 'insomnia/8.6.0', 'Content-Type': 'application/json' }
+        };
+    
+        fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options)
+            .then(response => {
+                if (response.ok) {
+                    setTasks([]);
+                }
+            })
+            .catch(err => console.error(err));
+    };    
+
     const handleNewTaskChange = (event) => {
         setNewTask(event.target.value);
     };
@@ -64,6 +79,8 @@ const Home = () => {
                 {listItems}
                 <li className="list-group-item d-flex justify-content-between align-items-center"><strong>{tasks.length} tareas por hacer</strong></li>
             </ul>
+            <br></br>
+            <button onClick={clearAllTasks} className="btn btn-warning">Limpiar Todas las Tareas</button>
         </div>
     );
 };
