@@ -6,6 +6,31 @@ const Home = () => {
 
     useEffect(() => {
 
+        const createUser = async () => {
+            const url = 'https://playground.4geeks.com/apis/fake/todos/user/miritzila';
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify([])
+            };
+
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    throw new Error(`Error al crear el usuario. Código de respuesta: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('Usuario creado con éxito:', data);
+                
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        createUser();
+
         const loadTasks = () => {
             const options = {
                 method: 'GET',
@@ -46,27 +71,27 @@ const Home = () => {
         if (newTask.trim() !== "") {
             const taskToAdd = { label: newTask, done: false };
             const updatedTasks = [...tasks, taskToAdd];
-    
+
             const options = {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedTasks)
             };
-    
+
             try {
                 const response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options);
                 if (!response.ok) {
                     throw new Error('No se pudo actualizar la lista de tareas');
                 }
-                
+
                 setTasks(updatedTasks);
-                
+
                 setNewTask("");
             } catch (error) {
                 console.error(error);
             }
         }
-    };    
+    };
 
     const handleKeyPress = (event) => {
         if (event.key === "Enter") {
@@ -76,16 +101,16 @@ const Home = () => {
     };
 
     const removeTask = async (indexToRemove) => {
-        
+
         const updatedTasks = tasks.filter((_, index) => index !== indexToRemove);
         setTasks(updatedTasks);
-    
+
         const options = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedTasks)
         };
-    
+
         try {
             const response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options);
             if (!response.ok) {
@@ -94,7 +119,7 @@ const Home = () => {
         } catch (error) {
             console.error(error);
         }
-    };    
+    };
 
     const listItems = tasks.map((task, index) => (
         <li className="list-group-item d-flex justify-content-between align-items-center" key={index}>
