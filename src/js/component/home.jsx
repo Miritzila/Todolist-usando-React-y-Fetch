@@ -2,30 +2,28 @@ import React, { useEffect, useState } from "react";
 
 const Home = () => {
     const [tasks, setTasks] = useState([]);
+    const [newTask, setNewTask] = useState("");
 
-    useEffect(()=>{
+    useEffect(() => {
         const options = {
             method: 'GET',
             headers: {'User-Agent': 'insomnia/8.6.0', 'Content-Type': 'application/json'}
         };
-        
+
         fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options)
             .then(response => response.json())
             .then(response => {
-                debugger
-                setTasks(response)
+                setTasks(response);
             })
             .catch(err => console.error(err));
-    }, [])
-
-    const [newTask, setNewTask] = useState("");
+    }, []);
 
     const clearAllTasks = () => {
         const options = {
             method: 'DELETE',
             headers: { 'User-Agent': 'insomnia/8.6.0', 'Content-Type': 'application/json' }
         };
-    
+
         fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options)
             .then(response => {
                 if (response.ok) {
@@ -33,7 +31,7 @@ const Home = () => {
                 }
             })
             .catch(err => console.error(err));
-    };    
+    };
 
     const handleNewTaskChange = (event) => {
         setNewTask(event.target.value);
@@ -41,8 +39,22 @@ const Home = () => {
 
     const addTask = () => {
         if (newTask.trim() !== "") {
-            setTasks([...tasks, newTask]);
-            setNewTask("");
+            const taskToAdd = { label: newTask, done: false };
+            const options = {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(taskToAdd)
+            };
+
+            fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options)
+                .then(response => response.json())
+                .then(() => {
+                    // Construir el objeto de tarea y agregarlo a la lista local de tareas
+                    const newTaskObject = { ...taskToAdd };
+                    setTasks([...tasks, newTaskObject]);
+                    setNewTask("");
+                })
+                .catch(err => console.error(err));
         }
     };
 
@@ -65,21 +77,18 @@ const Home = () => {
 
     return (
         <div className="container">
-            <div className="w-50 text-center mb-3">
-            </div>
+            <input
+                className="form-control"
+                type="text"
+                placeholder="Añade una nueva tarea..."
+                value={newTask}
+                onChange={handleNewTaskChange}
+                onKeyPress={handleKeyPress}
+            />
             <ul className="list-group w-100">
-                <li><input
-                    className="form-control"
-                    type="text"
-                    placeholder="Añade una nueva tarea..."
-                    value={newTask}
-                    onChange={handleNewTaskChange}
-                    onKeyPress={handleKeyPress}
-                /></li>
                 {listItems}
-                <li className="list-group-item d-flex justify-content-between align-items-center"><strong>{tasks.length} tareas por hacer</strong></li>
             </ul>
-            <br></br>
+            <br />
             <button onClick={clearAllTasks} className="btn btn-warning">Limpiar Todas las Tareas</button>
         </div>
     );
