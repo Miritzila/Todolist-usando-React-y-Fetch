@@ -6,27 +6,6 @@ const Home = () => {
 
     useEffect(() => {
 
-        const createUser = () => {
-            const options = {
-                method: 'POST',
-                headers: { 'User-Agent': 'insomnia/8.6.0', 'Content-Type': 'application/json' },
-            };
-
-            fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('No se pudo crear el usuario');
-                    }
-                    return response.json();
-                })
-                .then(() => {
-                    console.log('Usuario creado con éxito');
-                })
-                .catch(err => console.error(err));
-        };
-
-        createUser();
-
         const loadTasks = () => {
             const options = {
                 method: 'GET',
@@ -63,35 +42,59 @@ const Home = () => {
         setNewTask(event.target.value);
     };
 
-    const addTask = () => {
+    const addTask = async () => {
         if (newTask.trim() !== "") {
             const taskToAdd = { label: newTask, done: false };
+            const updatedTasks = [...tasks, taskToAdd];
+    
             const options = {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(taskToAdd)
+                body: JSON.stringify(updatedTasks)
             };
-
-            fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options)
-                .then(response => response.json())
-                .then(() => {
-                    const newTaskObject = { ...taskToAdd };
-                    setTasks([...tasks, newTaskObject]);
-                    setNewTask("");
-                })
-                .catch(err => console.error(err));
+    
+            try {
+                const response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options);
+                if (!response.ok) {
+                    throw new Error('No se pudo actualizar la lista de tareas');
+                }
+                
+                setTasks(updatedTasks);
+                
+                setNewTask("");
+            } catch (error) {
+                console.error(error);
+            }
         }
-    };
+    };    
 
     const handleKeyPress = (event) => {
         if (event.key === "Enter") {
             addTask();
+            event.preventDefault();
         }
     };
 
-    const removeTask = (indexToRemove) => {
-        setTasks(tasks.filter((_, index) => index !== indexToRemove));
-    };
+    const removeTask = async (indexToRemove) => {
+        
+        const updatedTasks = tasks.filter((_, index) => index !== indexToRemove);
+        setTasks(updatedTasks);
+    
+        const options = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedTasks)
+        };
+    
+        try {
+            const response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options);
+            if (!response.ok) {
+                throw new Error('No se pudo actualizar la lista de tareas en el servidor');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };    
 
     const listItems = tasks.map((task, index) => (
         <li className="list-group-item d-flex justify-content-between align-items-center" key={index}>
