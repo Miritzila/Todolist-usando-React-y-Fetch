@@ -5,17 +5,43 @@ const Home = () => {
     const [newTask, setNewTask] = useState("");
 
     useEffect(() => {
-        const options = {
-            method: 'GET',
-            headers: {'User-Agent': 'insomnia/8.6.0', 'Content-Type': 'application/json'}
+
+        const createUser = () => {
+            const options = {
+                method: 'POST',
+                headers: { 'User-Agent': 'insomnia/8.6.0', 'Content-Type': 'application/json' },
+            };
+
+            fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('No se pudo crear el usuario');
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    console.log('Usuario creado con éxito');
+                })
+                .catch(err => console.error(err));
         };
 
-        fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options)
-            .then(response => response.json())
-            .then(response => {
-                setTasks(response);
-            })
-            .catch(err => console.error(err));
+        createUser();
+
+        const loadTasks = () => {
+            const options = {
+                method: 'GET',
+                headers: { 'User-Agent': 'insomnia/8.6.0', 'Content-Type': 'application/json' }
+            };
+
+            fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options)
+                .then(response => response.json())
+                .then(response => {
+                    setTasks(response);
+                })
+                .catch(err => console.error(err));
+        };
+
+        loadTasks();
     }, []);
 
     const clearAllTasks = () => {
@@ -49,7 +75,6 @@ const Home = () => {
             fetch('https://playground.4geeks.com/apis/fake/todos/user/miritzila', options)
                 .then(response => response.json())
                 .then(() => {
-                    // Construir el objeto de tarea y agregarlo a la lista local de tareas
                     const newTaskObject = { ...taskToAdd };
                     setTasks([...tasks, newTaskObject]);
                     setNewTask("");
